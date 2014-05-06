@@ -31,6 +31,8 @@
 #include <IrcConnection>
 #include <IrcMessage>
 
+IRC_USE_NAMESPACE
+
 namespace Quassel
 {
     static QString messageCommand(Message::Type type)

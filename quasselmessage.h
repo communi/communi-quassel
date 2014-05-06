@@ -29,9 +29,11 @@
 #ifndef QUASSELMESSAGE_H
 #define QUASSELMESSAGE_H
 
+#include <IrcGlobal>
+
 class Message;
-class IrcMessage;
-class IrcConnection;
+IRC_FORWARD_DECLARE_CLASS(IrcMessage)
+IRC_FORWARD_DECLARE_CLASS(IrcConnection)
 
 namespace Quassel
 {

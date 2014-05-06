@@ -39,6 +39,8 @@
 #include "network.h"
 #include "message.h"
 
+IRC_USE_NAMESPACE
+
 QuasselProtocol::QuasselProtocol(IrcConnection* connection) : IrcProtocol(connection)
 {
     d.proxy = 0;

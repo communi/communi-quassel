@@ -29,11 +29,12 @@
 #ifndef QUASSELAUTHHANDLER_H
 #define QUASSELAUTHHANDLER_H
 
+#include <IrcGlobal>
 #include "authhandler.h"
 
 struct NetworkId;
 class RemotePeer;
-class IrcConnection;
+IRC_FORWARD_DECLARE_CLASS(IrcConnection)
 
 class QuasselAuthHandler : public AuthHandler
 {

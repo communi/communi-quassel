@@ -41,12 +41,12 @@ class SignalProxy;
 class QuasselBacklog;
 class QuasselAuthHandler;
 
-class QuasselProtocol : public IrcProtocol
+class QuasselProtocol : public IRC_PREPEND_NAMESPACE(IrcProtocol)
 {
     Q_OBJECT
 
 public:
-    explicit QuasselProtocol(IrcConnection* connection);
+    explicit QuasselProtocol(IRC_PREPEND_NAMESPACE(IrcConnection*) connection);
     virtual ~QuasselProtocol();
 
     virtual void open();

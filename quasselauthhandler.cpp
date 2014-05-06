@@ -33,6 +33,8 @@
 #include <IrcConnection>
 #include <QtEndian>
 
+IRC_USE_NAMESPACE
+
 QuasselAuthHandler::QuasselAuthHandler(IrcConnection* connection) : AuthHandler(connection)
 {
     d.peer = 0;
