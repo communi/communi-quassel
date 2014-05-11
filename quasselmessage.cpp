@@ -127,8 +127,11 @@ namespace Quassel
             break;
         }
 
-        foreach (IrcMessage* msg, msgs)
+        foreach (IrcMessage* msg, msgs) {
             msg->setTimeStamp(message.timestamp());
+            if (message.flags() & Message::Backlog)
+                msg->setFlags(msg->flags() | IrcMessage::Playback);
+        }
 
         return msgs;
     }
