@@ -37,7 +37,7 @@ IRC_FORWARD_DECLARE_CLASS(IrcConnection)
 
 namespace Quassel
 {
-    IrcMessage* convertMessage(const Message& message, IrcConnection* connection);
+    QList<IrcMessage*> convertMessage(const Message& message, IrcConnection* connection);
 }
 
 #endif // QUASSELMESSAGE_H

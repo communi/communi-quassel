@@ -185,8 +185,8 @@ void QuasselProtocol::updateUsers(IrcChannel* channel)
 
 void QuasselProtocol::receiveMessage(const Message& message)
 {
-    IrcMessage* msg = Quassel::convertMessage(message, connection());
-    if (msg)
+    QList<IrcMessage*> msgs = Quassel::convertMessage(message, connection());
+    foreach (IrcMessage* msg, msgs)
         IrcProtocol::receiveMessage(msg);
     d.lastMsg = message.msgId();
 }

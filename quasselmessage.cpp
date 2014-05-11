@@ -54,17 +54,18 @@ namespace Quassel
         case Message::Error:        return QString();
         case Message::DayChange:    return QString();
         case Message::Topic:        return QLatin1String("TOPIC");
-        case Message::NetsplitJoin: return QString();
-        case Message::NetsplitQuit: return QString();
+        case Message::NetsplitJoin: return QLatin1String("JOIN");
+        case Message::NetsplitQuit: return QLatin1String("QUIT");
         case Message::Invite:       return QLatin1String("INVITE");
         default:                    return QString();
         }
     }
 
-    IrcMessage* convertMessage(const Message& message, IrcConnection* connection)
+    QList<IrcMessage*> convertMessage(const Message& message, IrcConnection* connection)
     {
+        QList<IrcMessage*> msgs;
         if (message.flags() & Message::Self)
-            return 0;
+            return msgs;
 
         QString buffer = message.bufferInfo().bufferName();
         QString command = messageCommand(message.type());
@@ -74,7 +75,6 @@ namespace Quassel
                 message.type() == Message::Topic || message.type() == Message::Invite)
             split = contents.split(' ', QString::SkipEmptyParts);
 
-        IrcMessage* msg = 0;
         switch (message.type())
         {
         case Message::Action:
@@ -84,17 +84,17 @@ namespace Quassel
         case Message::Notice:
         case Message::Join:
         case Message::Part:
-            msg = IrcMessage::fromParameters(message.sender(), command, QStringList() << buffer << contents, connection);
+            msgs += IrcMessage::fromParameters(message.sender(), command, QStringList() << buffer << contents, connection);
             break;
         case Message::Nick:
         case Message::Quit:
-            msg = IrcMessage::fromParameters(message.sender(), command, QStringList() << contents, connection);
+            msgs += IrcMessage::fromParameters(message.sender(), command, QStringList() << contents, connection);
             break;
         case Message::Mode:
-            msg = IrcMessage::fromParameters(message.sender(), command, split, connection);
+            msgs += IrcMessage::fromParameters(message.sender(), command, split, connection);
             break;
         case Message::Kick:
-            msg = IrcMessage::fromParameters(message.sender(), command, QStringList() << buffer << split.value(0) << QStringList(split.mid(1)).join(" "), connection);
+            msgs += IrcMessage::fromParameters(message.sender(), command, QStringList() << buffer << split.value(0) << QStringList(split.mid(1)).join(" "), connection);
             break;
         case Message::Topic:
             // There's no sane way to parse the topic from a _localized_ message that could be:
@@ -104,29 +104,32 @@ namespace Quassel
             // - "nick has changed topic for #channel to: "topic""
             break;
         case Message::Invite:
-            msg = IrcMessage::fromParameters(split.first(), command, QStringList() << connection->nickName() << split.last(), connection);
+            msgs += IrcMessage::fromParameters(split.first(), command, QStringList() << connection->nickName() << split.last(), connection);
             break;
         case Message::Server:
-            qDebug() << message.contents();
-            msg = IrcMessage::fromParameters(message.sender(), QString::number(Irc::RPL_WELCOME), QStringList() << "*" << message.contents(), connection);
+            msgs += IrcMessage::fromParameters(message.sender(), QString::number(Irc::RPL_WELCOME), QStringList() << "*" << message.contents(), connection);
             break;
         case Message::Error:
-            msg = IrcMessage::fromParameters("ERROR", "NOTICE", QStringList() << "*" << contents, connection);
+            msgs += IrcMessage::fromParameters("ERROR", "NOTICE", QStringList() << "*" << contents, connection);
+            break;
+        case Message::NetsplitQuit:
+            split = contents.split("#:#");
+            for (int i = 0; i < split.count() - i; ++i)
+                msgs += IrcMessage::fromParameters(split.at(i), command, QStringList() << split.last(), connection);
             break;
             // TODO:
         case Message::Kill:
         case Message::Info:
         case Message::DayChange:
         case Message::NetsplitJoin:
-        case Message::NetsplitQuit:
         default:
             qDebug() << "Quassel::convertMessage(): TODO:" << QString::number(message.type(), 16) << message.sender() << message.contents();
             break;
         }
 
-        if (msg)
+        foreach (IrcMessage* msg, msgs)
             msg->setTimeStamp(message.timestamp());
 
-        return msg;
+        return msgs;
     }
 }
