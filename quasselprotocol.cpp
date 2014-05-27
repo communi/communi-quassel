@@ -262,7 +262,7 @@ void QuasselProtocol::sessionState(const Protocol::SessionState& msg)
 
     NetworkId nid = findNetworkId(d.handler->networkId(), nids);
     if (nid.isValid()) {
-        d.network = new Network(msg.networkIds.value(0).value<NetworkId>(), this);
+        d.network = new Network(nid, this);
         connect(d.network, SIGNAL(initDone()), this, SLOT(initNetwork()));
         d.network->setProxy(d.proxy);
         d.proxy->synchronize(d.network);
