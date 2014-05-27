@@ -55,7 +55,7 @@ RemotePeer* QuasselAuthHandler::peer() const
 
 QString QuasselAuthHandler::userName() const
 {
-    return d.connection->userName().section('/', 0);
+    return d.connection->userName().section('/', 0, 0);
 }
 
 NetworkId QuasselAuthHandler::networkId() const
