@@ -252,16 +252,14 @@ void QuasselProtocol::loginSucceed(const Protocol::LoginSuccess& msg)
 
 void QuasselProtocol::sessionState(const Protocol::SessionState& msg)
 {
-    RemotePeer* peer = d.handler->peer();
-    peer->setParent(d.proxy);
-    d.proxy->addPeer(peer);
-    d.handler->deleteLater();
-
     QList<int> nids = toIntList(msg.networkIds);
     receiveInfo(Irc::RPL_MYINFO, QString("Available networks: (%1)").arg(toString(nids)));
 
     NetworkId nid = findNetworkId(d.handler->networkId(), nids);
     if (nid.isValid()) {
+        RemotePeer* peer = d.handler->peer();
+        peer->setParent(d.proxy);
+        d.proxy->addPeer(peer);
         d.network = new Network(nid, this);
         connect(d.network, SIGNAL(initDone()), this, SLOT(initNetwork()));
         d.network->setProxy(d.proxy);
@@ -276,6 +274,7 @@ void QuasselProtocol::sessionState(const Protocol::SessionState& msg)
         setStatus(IrcConnection::Error);
     }
 
+    d.handler->deleteLater();
     d.handler = 0;
 }
 
