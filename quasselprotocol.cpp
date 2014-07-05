@@ -100,9 +100,35 @@ bool QuasselProtocol::write(const QByteArray& data)
             return true;
     }
 
-    BufferInfo buffer = BufferInfo::fakeStatusBuffer(d.network->networkId());
-    emit sendInput(buffer, "/QUOTE " + QString::fromUtf8(data));
-    return true;
+    QByteArray line(data);
+    const QByteArray cmd = line.mid(0, line.indexOf(' '));
+    line.remove(0, cmd.length() + 1);
+
+    if (cmd == "PRIVMSG" || cmd == "NOTICE") {
+        const QByteArray target = line.mid(0, line.indexOf(' '));
+        line.remove(0, target.length() + 1);
+        if (line.startsWith(":")) {
+            BufferInfo buffer = findBuffer(QString::fromUtf8(target));
+            if (buffer.isValid()) {
+                line.remove(0, 1);
+                if (line.startsWith("\1ACTION ") && line.endsWith('\1')) {
+                    line.remove(0, 8);
+                    line.remove(line.length() - 1, 1);
+                    emit sendInput(buffer, "/ME " + QString::fromUtf8(line));
+                } else if (cmd == "PRIVMSG") {
+                    emit sendInput(buffer, "/SAY " + QString::fromUtf8(line));
+                } else {
+                    emit sendInput(buffer, "/NOTICE " + buffer.bufferName() + " " + QString::fromUtf8(line));
+                }
+                return true;
+            }
+        }
+    } else {
+        BufferInfo buffer = BufferInfo::fakeStatusBuffer(d.network->networkId());
+        emit sendInput(buffer, "/QUOTE " + QString::fromUtf8(data));
+        return true;
+    }
+    return false;
 }
 
 void QuasselProtocol::initNetwork()
