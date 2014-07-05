@@ -212,13 +212,14 @@ void QuasselProtocol::updateUsers(IrcChannel* channel)
 void QuasselProtocol::receiveMessage(const Message& message)
 {
     BufferInfo buffer = message.bufferInfo();
-    if (buffer.networkId() == d.network->networkId())
+    if (buffer.networkId() == d.network->networkId()) {
         d.buffers.insert(buffer.bufferName(), buffer);
 
-    QList<IrcMessage*> msgs = Quassel::convertMessage(message, connection());
-    foreach (IrcMessage* msg, msgs)
-        IrcProtocol::receiveMessage(msg);
-    d.lastMsg = message.msgId();
+        QList<IrcMessage*> msgs = Quassel::convertMessage(message, connection());
+        foreach (IrcMessage* msg, msgs)
+            IrcProtocol::receiveMessage(msg);
+        d.lastMsg = message.msgId();
+    }
 }
 
 static QList<int> toIntList(const QVariantList& networkIds)
@@ -293,7 +294,8 @@ void QuasselProtocol::sessionState(const Protocol::SessionState& msg)
         d.network = new Network(nid, this);
         foreach (const QVariant& v, msg.bufferInfos) {
             BufferInfo buffer = v.value<BufferInfo>();
-            d.buffers.insert(buffer.bufferName(), buffer);
+            if (buffer.networkId() == nid)
+                d.buffers.insert(buffer.bufferName(), buffer);
         }
         connect(d.network, SIGNAL(initDone()), this, SLOT(initNetwork()));
         d.network->setProxy(d.proxy);
