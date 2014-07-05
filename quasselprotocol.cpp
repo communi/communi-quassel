@@ -28,7 +28,6 @@
 
 #include "quasselprotocol.h"
 #include "quasselauthhandler.h"
-#include "bufferviewconfig.h"
 #include "quasselmessage.h"
 #include "backlogmanager.h"
 #include "quasselbacklog.h"
