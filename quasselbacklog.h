@@ -41,6 +41,7 @@ public:
     QuasselBacklog(QObject *parent = 0);
 
 public slots:
+    void receiveBacklog(BufferId buffer, MsgId first, MsgId last, int limit, int additional, QVariantList msgs);
     void receiveBacklogAll(MsgId first, MsgId last, int limit, int additional, QVariantList msgs);
 
 signals:

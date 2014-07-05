@@ -33,6 +33,21 @@ QuasselBacklog::QuasselBacklog(QObject *parent) : BacklogManager(parent)
 {
 }
 
+void QuasselBacklog::receiveBacklog(BufferId buffer, MsgId first, MsgId last, int limit, int additional, QVariantList msgs)
+{
+    Q_UNUSED(buffer)
+    Q_UNUSED(first)
+    Q_UNUSED(last)
+    Q_UNUSED(limit)
+    Q_UNUSED(additional)
+
+    for (int i = msgs.count() - 1; i >= 0; --i) {
+        Message msg = msgs.at(i).value<Message>();
+        msg.setFlags(msg.flags() | Message::Backlog);
+        emit messageReceived(msg);
+    }
+}
+
 void QuasselBacklog::receiveBacklogAll(MsgId first, MsgId last, int limit, int additional, QVariantList msgs)
 {
     Q_UNUSED(first)

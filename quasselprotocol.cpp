@@ -147,7 +147,8 @@ void QuasselProtocol::initNetwork()
     connect(d.network, SIGNAL(ircChannelAdded(IrcChannel*)), SLOT(addChannel(IrcChannel*)));
 
     d.proxy->synchronize(d.backlog);
-    d.backlog->requestBacklogAll(d.lastMsg, -1, 100); // TODO
+    foreach (const BufferInfo& buffer, d.buffers)
+        d.backlog->requestBacklog(buffer.bufferId(), -1, -1, 100); // TODO: limit (100)
 }
 
 void QuasselProtocol::addChannel(IrcChannel* channel)
@@ -290,6 +291,10 @@ void QuasselProtocol::sessionState(const Protocol::SessionState& msg)
         peer->setParent(d.proxy);
         d.proxy->addPeer(peer);
         d.network = new Network(nid, this);
+        foreach (const QVariant& v, msg.bufferInfos) {
+            BufferInfo buffer = v.value<BufferInfo>();
+            d.buffers.insert(buffer.bufferName(), buffer);
+        }
         connect(d.network, SIGNAL(initDone()), this, SLOT(initNetwork()));
         d.network->setProxy(d.proxy);
         d.proxy->synchronize(d.network);
