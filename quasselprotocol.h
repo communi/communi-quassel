@@ -74,6 +74,7 @@ protected slots:
 
 private:
     QString prefix() const;
+    BufferInfo findBuffer(const QString& name) const;
     void receiveInfo(int code, const QString& info);
 
     struct Private {
@@ -82,6 +83,7 @@ private:
         SignalProxy* proxy;
         QuasselBacklog* backlog;
         QuasselAuthHandler* handler;
+        QHash<QString, BufferInfo> buffers;
     } d;
 };
 

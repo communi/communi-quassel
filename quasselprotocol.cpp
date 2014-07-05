@@ -185,6 +185,10 @@ void QuasselProtocol::updateUsers(IrcChannel* channel)
 
 void QuasselProtocol::receiveMessage(const Message& message)
 {
+    BufferInfo buffer = message.bufferInfo();
+    if (buffer.networkId() == d.network->networkId())
+        d.buffers.insert(buffer.bufferName(), buffer);
+
     QList<IrcMessage*> msgs = Quassel::convertMessage(message, connection());
     foreach (IrcMessage* msg, msgs)
         IrcProtocol::receiveMessage(msg);
@@ -281,6 +285,15 @@ void QuasselProtocol::sessionState(const Protocol::SessionState& msg)
 QString QuasselProtocol::prefix() const
 {
     return connection()->nickName() + "!" + connection()->userName() + "@quassel";
+}
+
+BufferInfo QuasselProtocol::findBuffer(const QString& name) const
+{
+    foreach (const BufferInfo& buffer, d.buffers) {
+        if (!buffer.bufferName().compare(name, Qt::CaseInsensitive))
+            return buffer;
+    }
+    return BufferInfo();
 }
 
 void QuasselProtocol::receiveInfo(int code, const QString &info)
