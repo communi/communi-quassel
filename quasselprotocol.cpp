@@ -253,14 +253,12 @@ static NetworkId findNetworkId(const NetworkId& nid, const QList<int>& networkId
 
 void QuasselProtocol::protocolUnsupported()
 {
-    receiveInfo(Irc::ERR_UNKNOWNERROR, tr("Unsupported Quassel protocol"));
-    setStatus(IrcConnection::Error);
+    receiveError(tr("Unsupported Quassel protocol"));
 }
 
 void QuasselProtocol::clientDenied(const Protocol::ClientDenied& msg)
 {
-    receiveInfo(Irc::ERR_UNKNOWNERROR, tr("Client denied: %1").arg(msg.errorString));
-    setStatus(IrcConnection::Error);
+    receiveError(tr("Client denied: %1").arg(msg.errorString));
 }
 
 void QuasselProtocol::clientRegistered(const Protocol::ClientRegistered& msg)
@@ -272,8 +270,7 @@ void QuasselProtocol::clientRegistered(const Protocol::ClientRegistered& msg)
 
 void QuasselProtocol::loginFailed(const Protocol::LoginFailed& msg)
 {
-    receiveInfo(Irc::ERR_UNKNOWNERROR, tr("Login failed: %1").arg(msg.errorString));
-    setStatus(IrcConnection::Error);
+    receiveError(tr("Login failed: %1").arg(msg.errorString));
 }
 
 void QuasselProtocol::loginSucceed(const Protocol::LoginSuccess& msg)
@@ -304,10 +301,9 @@ void QuasselProtocol::sessionState(const Protocol::SessionState& msg)
         receiveInfo(Irc::RPL_MYINFO, "Synchronizing...");
     } else {
         if (d.handler->networkId().isValid())
-            receiveInfo(Irc::ERR_UNKNOWNERROR, QString("Unknown network: %1").arg(d.handler->networkId().toInt()));
+            receiveError(QString("Unknown network: %1").arg(d.handler->networkId().toInt()));
         else
-            receiveInfo(Irc::ERR_UNKNOWNERROR, QString("Choose a network by setting username '%1/network'").arg(d.handler->userName()));
-        setStatus(IrcConnection::Error);
+            receiveError(QString("Choose a network by setting username '%1/network'").arg(d.handler->userName()));
     }
 
     d.handler->deleteLater();
@@ -332,4 +328,11 @@ void QuasselProtocol::receiveInfo(int code, const QString &info)
 {
     IrcMessage* msg = IrcMessage::fromParameters(prefix(), QString::number(code), QStringList() << connection()->nickName() << info, connection());
     IrcProtocol::receiveMessage(msg);
+}
+
+void QuasselProtocol::receiveError(const QString& error)
+{
+    receiveInfo(Irc::ERR_UNKNOWNERROR, error);
+    connection()->close();
+    setStatus(IrcConnection::Error);
 }

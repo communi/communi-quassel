@@ -76,6 +76,7 @@ private:
     QString prefix() const;
     BufferInfo findBuffer(const QString& name) const;
     void receiveInfo(int code, const QString& info);
+    void receiveError(const QString& info);
 
     struct Private {
         MsgId lastMsg;
