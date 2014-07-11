@@ -46,6 +46,7 @@ public:
     RemotePeer* peer() const;
     QString userName() const;
     NetworkId networkId() const;
+    bool isProbing() const;
 
 public slots:
     void authenticate();
@@ -68,10 +69,17 @@ protected:
     void handle(const Protocol::SessionState& msg);
 
 private slots:
-    void initialize();
+    void onReadyRead();
+    void onSocketConnected();
+    void onSocketDisconnected();
+    void onSocketError(QAbstractSocket::SocketError error);
 
 private:
+    void login();
+    void setPeer(RemotePeer* peer);
+
     struct Private {
+        bool legacy;
         bool probing;
         RemotePeer* peer;
         IrcConnection* connection;

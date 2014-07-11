@@ -4,10 +4,10 @@
 
 isEmpty(QUASSELDIR):error(QUASSELDIR must be set)
 
-PEERDIR = $$QUASSELDIR/protocols/datastream
+PROTODIR = $$QUASSELDIR/protocols
 
-INCLUDEPATH += $$PWD $$QUASSELDIR $$PEERDIR
-DEPENDPATH += $$PWD $$QUASSELDIR $$PEERDIR
+INCLUDEPATH += $$PWD $$QUASSELDIR $$PROTODIR/datastream $$PROTODIR/legacy
+DEPENDPATH += $$PWD $$QUASSELDIR $$PROTODIR/datastream $$PROTODIR/legacy
 
 HEADERS += $$PWD/quasselauthhandler.h
 HEADERS += $$PWD/quasselbacklog.h
@@ -52,8 +52,11 @@ SOURCES += $$QUASSELDIR/signalproxy.cpp
 SOURCES += $$QUASSELDIR/syncableobject.cpp
 SOURCES += $$QUASSELDIR/util.cpp
 
-HEADERS += $$PEERDIR/datastreampeer.h
-SOURCES += $$PEERDIR/datastreampeer.cpp
+HEADERS += $$PROTODIR/datastream/datastreampeer.h
+SOURCES += $$PROTODIR/datastream/datastreampeer.cpp
+
+HEADERS += $$PROTODIR/legacy/legacypeer.h
+SOURCES += $$PROTODIR/legacy/legacypeer.cpp
 
 win32:SOURCES += $$QUASSELDIR/logbacktrace_win.cpp
 else:unix:SOURCES += $$QUASSELDIR/logbacktrace_unix.cpp

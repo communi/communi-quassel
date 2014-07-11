@@ -58,6 +58,9 @@ QuasselProtocol::~QuasselProtocol()
 
 void QuasselProtocol::open()
 {
+    if (d.handler)
+        return;
+
     d.proxy = new SignalProxy(this);
     d.proxy->attachSignal(this, SIGNAL(sendInput(BufferInfo,QString)));
     d.proxy->attachSlot(SIGNAL(displayMsg(Message)), this, SLOT(receiveMessage(Message)));
@@ -73,6 +76,9 @@ void QuasselProtocol::open()
 
 void QuasselProtocol::close()
 {
+    if (d.handler && d.handler->isProbing())
+        return;
+
     if (d.proxy) {
         d.proxy->deleteLater();
         d.proxy = 0;
